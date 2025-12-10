@@ -1,5 +1,3 @@
-# Citation: Used infomation from Flask documentation (https://flask.palletsprojects.com/en/3.0.x/quickstart/)
-
 import hashlib  # For generating short codes from URLs to be at the end (I think hash values are really cool)
 
 from flask import Flask, request, request, redirect, url_for, session, flash, abort, render_template_string
@@ -131,7 +129,7 @@ def index():
     base = request.host_url.rstrip('/')
     list_html = ''
     for row in rows:
-        short_code, long_url = row[0], row[1]
+        short_code, long_url = row[0], row[1] # formatting the URL lines for display with the delete button
         owner = row[2] if len(row) == 3 else session['username']
         delete_link = f'<a href="/delete/{short_code}" style="color:red">[Delete]</a>' \
                       if session.get('is_admin') or owner == session['username'] else ''
@@ -145,7 +143,7 @@ def index():
         </form>
         <h3>Shortened URLs:</h3>
         <ul>{list_html or "<i>none yet</i>"}</ul>
-    '''
+    ''' # more HTML formatting, just guessing 70 is enough for a link, worked for the ones I testted
 
 # redirect the short hash codes to the original URL
 @app.route('/<short_code>')
@@ -163,11 +161,11 @@ def redirect_short(short_code):
 # Deletes a users URL code, or an admin can as well
 @app.route('/delete/<short_code>')
 def delete(short_code):
-    conn = get_db()
+    conn = get_db() # connect to the database and set the cursor again
     cur = conn.cursor()
     if session.get('is_admin'): # admin delete anything
         cur.execute("DELETE FROM urls WHERE short_code=%s", (short_code,))
-    else: # user can delete a user's URL
+    else: # user can delete that user's URL
         cur.execute("DELETE FROM urls WHERE short_code=%s AND user_id=%s",(short_code, session['user_id']))
     conn.commit()
     cur.close()
